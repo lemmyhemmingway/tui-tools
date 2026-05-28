@@ -1,0 +1,21 @@
+[package]
+name = "devtool"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "devtool"
+path = "src/main.rs"
+
+[dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+serde_json = "1"
+base64 = "0.22"
+sha2 = "0.10"
+md-5 = "0.10"
+sha1 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+regex = "1"
+chrono = "0.4"
+unicode-width = "0.1"
