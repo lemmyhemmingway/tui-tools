@@ -16,6 +16,7 @@ use ratatui::{
 };
 use std::io;
 use tools::{Action, Focus, Tool};
+use tools::json::JsonTool;
 
 struct App {
     selected: usize,
@@ -28,7 +29,9 @@ impl App {
         Self {
             selected: 0,
             focus: Focus::Sidebar,
-            tools: vec![],
+            tools: vec![
+            Box::new(JsonTool::new()),
+        ],
         }
     }
 }
@@ -90,23 +93,16 @@ fn draw(frame: &mut ratatui::Frame, app: &mut App) {
     );
 }
 
-fn main() -> io::Result<()> {
-    enable_raw_mode()?;
-    let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen)?;
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
-    let mut app = App::new();
-
+fn run_app(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, app: &mut App) -> io::Result<()> {
     loop {
-        terminal.draw(|f| draw(f, &mut app))?;
+        terminal.draw(|f| draw(f, app))?;
 
         let Event::Key(key) = event::read()? else { continue };
 
         match app.focus {
             Focus::Sidebar => match key.code {
-                KeyCode::Char('q') => break,
-                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => break,
+                KeyCode::Char('q') => return Ok(()),
+                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => return Ok(()),
                 KeyCode::Char('j') | KeyCode::Down => {
                     if app.selected + 1 < app.tools.len() {
                         app.selected += 1;
@@ -125,7 +121,11 @@ fn main() -> io::Result<()> {
                 _ => {
                     if !app.tools.is_empty() {
                         let focus = app.focus;
-                        app.tools[app.selected].handle_key(key, focus);
+                        let action = app.tools[app.selected].handle_key(key, focus);
+                        match action {
+                            Action::Quit => return Ok(()),
+                            _ => {}
+                        }
                     }
                 }
             },
@@ -133,15 +133,28 @@ fn main() -> io::Result<()> {
                 let focus = app.focus;
                 let action = app.tools[app.selected].handle_key(key, focus);
                 match action {
-                    Action::Quit => break,
+                    Action::Quit => return Ok(()),
                     Action::FocusSidebar => app.focus = Focus::Sidebar,
                     Action::Nothing => {}
                 }
             }
         }
     }
+}
 
+fn run() -> io::Result<()> {
+    enable_raw_mode()?;
+    let mut stdout = io::stdout();
+    execute!(stdout, EnterAlternateScreen)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    let mut app = App::new();
+    let result = run_app(&mut terminal, &mut app);
     disable_raw_mode()?;
     execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
-    Ok(())
+    result
+}
+
+fn main() -> io::Result<()> {
+    run()
 }
