@@ -1,0 +1,38 @@
+name: harbor
+
+on:
+  push:
+    paths:
+      - 'harbor/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'harbor/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            harbor/target
+          key: ${{ runner.os }}-harbor-${{ hashFiles('harbor/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-harbor-
+
+      - name: Build
+        run: cargo build --release --manifest-path harbor/Cargo.toml
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: harbor-macos
+          path: harbor/target/release/harbor

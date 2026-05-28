@@ -1,0 +1,38 @@
+name: devtool
+
+on:
+  push:
+    paths:
+      - 'devtool/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'devtool/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            devtool/target
+          key: ${{ runner.os }}-devtool-${{ hashFiles('devtool/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-devtool-
+
+      - name: Build
+        run: cargo build --release --manifest-path devtool/Cargo.toml
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devtool-macos
+          path: devtool/target/release/devtool

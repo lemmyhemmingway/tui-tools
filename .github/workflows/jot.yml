@@ -1,0 +1,38 @@
+name: jot
+
+on:
+  push:
+    paths:
+      - 'jot/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'jot/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            jot/target
+          key: ${{ runner.os }}-jot-${{ hashFiles('jot/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-jot-
+
+      - name: Build
+        run: cargo build --release --manifest-path jot/Cargo.toml
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jot-macos
+          path: jot/target/release/jot

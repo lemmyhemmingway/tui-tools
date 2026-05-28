@@ -1,0 +1,38 @@
+name: recall
+
+on:
+  push:
+    paths:
+      - 'recall/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'recall/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            recall/target
+          key: ${{ runner.os }}-recall-${{ hashFiles('recall/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-recall-
+
+      - name: Build
+        run: cargo build --release --manifest-path recall/Cargo.toml
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: recall-macos
+          path: recall/target/release/recall

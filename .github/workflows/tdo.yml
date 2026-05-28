@@ -1,0 +1,38 @@
+name: tdo
+
+on:
+  push:
+    paths:
+      - 'tdo/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'tdo/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            tdo/target
+          key: ${{ runner.os }}-tdo-${{ hashFiles('tdo/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-tdo-
+
+      - name: Build
+        run: cargo build --release --manifest-path tdo/Cargo.toml
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tdo-macos
+          path: tdo/target/release/tdo
