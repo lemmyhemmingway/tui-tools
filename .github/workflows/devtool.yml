@@ -5,10 +5,11 @@ on:
     paths:
       - 'devtool/**'
     branches: [main]
+    tags:
+      - 'devtool-v*'
   pull_request:
     paths:
       - 'devtool/**'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -37,3 +38,9 @@ jobs:
         with:
           name: devtool-macos
           path: devtool/target/release/devtool
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/devtool-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: devtool/target/release/devtool
