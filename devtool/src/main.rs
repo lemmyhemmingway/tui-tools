@@ -16,7 +16,6 @@ use ratatui::{
 };
 use std::io;
 use tools::{Action, Focus, Tool};
-use tools::json::JsonTool;
 
 struct App {
     selected: usize,
@@ -30,8 +29,19 @@ impl App {
             selected: 0,
             focus: Focus::Sidebar,
             tools: vec![
-            Box::new(JsonTool::new()),
-        ],
+                Box::new(tools::json::JsonTool::new()),
+                Box::new(tools::base64::Base64Tool::new()),
+                Box::new(tools::jwt::JwtTool::new()),
+                Box::new(tools::hash::HashTool::new()),
+                Box::new(tools::url::UrlTool::new()),
+                Box::new(tools::uuid::UuidTool::new()),
+                Box::new(tools::timestamp::TimestampTool::new()),
+                Box::new(tools::regex::RegexTool::new()),
+                Box::new(tools::text_transform::TextTransformTool::new()),
+                Box::new(tools::number_base::NumberBaseTool::new()),
+                Box::new(tools::string_stats::StringStatsTool::new()),
+                Box::new(tools::html_entity::HtmlEntityTool::new()),
+            ],
         }
     }
 }
@@ -47,10 +57,6 @@ fn draw(frame: &mut ratatui::Frame, app: &mut App) {
         .constraints([Constraint::Length(18), Constraint::Min(0)])
         .split(root[0]);
 
-    let sidebar_area = columns[0];
-    let content_area = columns[1];
-    let footer_area = root[1];
-
     let items: Vec<ListItem> = app.tools.iter().enumerate().map(|(i, t)| {
         let style = if i == app.selected {
             Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)
@@ -62,34 +68,25 @@ fn draw(frame: &mut ratatui::Frame, app: &mut App) {
 
     frame.render_widget(
         List::new(items).block(Block::default().borders(Borders::ALL).title("tools")),
-        sidebar_area,
+        columns[0],
     );
 
-    if !app.tools.is_empty() {
-        let focus = app.focus;
-        app.tools[app.selected].render(frame, content_area, focus);
-    } else {
-        frame.render_widget(
-            Paragraph::new("no tools").block(Block::default().borders(Borders::ALL)),
-            content_area,
-        );
-    }
+    let focus = app.focus;
+    app.tools[app.selected].render(frame, columns[1], focus);
 
     let hints = if app.focus == Focus::Sidebar {
         "j/k: navigate  Enter: focus tool  q: quit".to_string()
-    } else if !app.tools.is_empty() {
+    } else {
         let tool_hints = app.tools[app.selected].footer_hints();
         if tool_hints.is_empty() {
             "Esc: sidebar  ctrl+c: quit".to_string()
         } else {
             format!("Esc: sidebar  {}  ctrl+c: quit", tool_hints)
         }
-    } else {
-        "q: quit".to_string()
     };
     frame.render_widget(
         Paragraph::new(hints).style(Style::default().fg(Color::DarkGray)),
-        footer_area,
+        root[1],
     );
 }
 
@@ -104,30 +101,15 @@ fn run_app(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, app: &mut App)
                 KeyCode::Char('q') => return Ok(()),
                 KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => return Ok(()),
                 KeyCode::Char('j') | KeyCode::Down => {
-                    if app.selected + 1 < app.tools.len() {
-                        app.selected += 1;
-                    }
+                    if app.selected + 1 < app.tools.len() { app.selected += 1; }
                 }
                 KeyCode::Char('k') | KeyCode::Up => {
-                    if app.selected > 0 {
-                        app.selected -= 1;
-                    }
+                    if app.selected > 0 { app.selected -= 1; }
                 }
                 KeyCode::Enter | KeyCode::Tab => {
-                    if !app.tools.is_empty() {
-                        app.focus = app.tools[app.selected].initial_focus();
-                    }
+                    app.focus = app.tools[app.selected].initial_focus();
                 }
-                _ => {
-                    if !app.tools.is_empty() {
-                        let focus = app.focus;
-                        let action = app.tools[app.selected].handle_key(key, focus);
-                        match action {
-                            Action::Quit => return Ok(()),
-                            _ => {}
-                        }
-                    }
-                }
+                _ => {}
             },
             Focus::Input | Focus::Pattern => {
                 let focus = app.focus;
@@ -135,6 +117,8 @@ fn run_app(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, app: &mut App)
                 match action {
                     Action::Quit => return Ok(()),
                     Action::FocusSidebar => app.focus = Focus::Sidebar,
+                    Action::FocusInput => app.focus = Focus::Input,
+                    Action::FocusPattern => app.focus = Focus::Pattern,
                     Action::Nothing => {}
                 }
             }

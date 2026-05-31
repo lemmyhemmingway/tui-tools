@@ -44,6 +44,18 @@ All four are built, committed, and wired into `aliases.sh`.
 - `[[link]]` rendering: shared `render_text()` in each tool
 - Navigation history: `Vec<NaiveDate>` stack, pushed on every `navigate_to` call
 
+## devtool — developer utilities TUI
+
+`alias dev="$HOME/github.com/scripts/devtool/target/release/devtool"`
+
+8 tools shipped: JSON, Base64, JWT, Hash, URL, UUID, Timestamp, Regex.
+4 tools in progress: Text Transform, Number Base, String Stats, HTML Entity.
+Backlog in `scripts/devtool/todo.md`.
+
+Stack: ratatui 0.29 + crossterm 0.28. Tool trait pattern: `handle_key(key, focus) -> Action`, `render(frame, area, focus)`. Reusable `TextArea` in `src/textarea.rs` (`handle_key` multiline, `handle_key_single` for single-line inputs).
+
+`Focus` enum: `Sidebar | Input | Pattern` (Pattern used by Regex for the top field).
+
 ## What was planned next but not built
 
 From the original brainstorm, the next candidate was:
@@ -61,5 +73,3 @@ After that: `pick` (file picker) and `env` (.env inspector).
 ```
 ~/github.com/scripts/   ← git repo root
 ```
-
-Two commits so far: initial + README.

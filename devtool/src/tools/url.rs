@@ -1,5 +1,4 @@
 use crate::textarea::TextArea;
-use base64::{engine::general_purpose::STANDARD, Engine as _};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
@@ -10,18 +9,54 @@ use ratatui::{
 };
 use super::{Action, Focus, Tool};
 
-pub struct Base64Tool {
+pub struct UrlTool {
     input: TextArea,
 }
 
-impl Base64Tool {
+impl UrlTool {
     pub fn new() -> Self {
         Self { input: TextArea::new() }
     }
 }
 
-impl Tool for Base64Tool {
-    fn name(&self) -> &'static str { "Base64" }
+fn percent_encode(s: &str) -> String {
+    let mut out = String::new();
+    for byte in s.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(byte as char);
+            }
+            _ => out.push_str(&format!("%{byte:02X}")),
+        }
+    }
+    out
+}
+
+fn percent_decode(s: &str) -> Result<String, String> {
+    let mut bytes: Vec<u8> = Vec::new();
+    let chars: Vec<char> = s.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] == '%' && i + 2 < chars.len() {
+            let hex: String = [chars[i + 1], chars[i + 2]].iter().collect();
+            match u8::from_str_radix(&hex, 16) {
+                Ok(b) => { bytes.push(b); i += 3; }
+                Err(_) => { bytes.push(b'%'); i += 1; }
+            }
+        } else if chars[i] == '+' {
+            bytes.push(b' ');
+            i += 1;
+        } else {
+            let mut buf = [0u8; 4];
+            bytes.extend_from_slice(chars[i].encode_utf8(&mut buf).as_bytes());
+            i += 1;
+        }
+    }
+    String::from_utf8(bytes).map_err(|e| e.to_string())
+}
+
+impl Tool for UrlTool {
+    fn name(&self) -> &'static str { "URL" }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, focus: Focus) {
         let chunks = Layout::default()
@@ -33,27 +68,23 @@ impl Tool for Base64Tool {
 
         let content = self.input.content();
 
-        let encoded = STANDARD.encode(content.as_bytes());
+        let encoded = percent_encode(&content);
         frame.render_widget(
             Paragraph::new(encoded)
                 .wrap(Wrap { trim: false })
-                .block(Block::default().borders(Borders::ALL).title(" Encoded ")
+                .block(Block::default().title(" Encoded ").borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Cyan))),
             chunks[1],
         );
 
-        let stripped: String = content.split_whitespace().collect();
-        let (dec_text, dec_color) = match STANDARD.decode(&stripped) {
-            Ok(bytes) => match String::from_utf8(bytes) {
-                Ok(s) => (s, Color::Green),
-                Err(_) => (String::from("[binary — not UTF-8]"), Color::Yellow),
-            },
-            Err(e) => (format!("Not valid base64: {e}"), Color::Red),
+        let (dec_text, dec_color) = match percent_decode(&content) {
+            Ok(s) => (s, Color::Green),
+            Err(e) => (format!("decode error: {e}"), Color::Red),
         };
         let dec_lines: Vec<Line> = dec_text.lines().map(|l| Line::from(l.to_owned())).collect();
         frame.render_widget(
             Paragraph::new(dec_lines)
-                .block(Block::default().borders(Borders::ALL).title(" Decoded ")
+                .block(Block::default().title(" Decoded ").borders(Borders::ALL)
                     .border_style(Style::default().fg(dec_color))),
             chunks[2],
         );

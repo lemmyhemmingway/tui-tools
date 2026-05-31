@@ -152,7 +152,7 @@ impl TextArea {
             let cy = area.y + 1 + (self.row - self.scroll) as u16;
             let cx = area.x + 1 + UnicodeWidthStr::width(&self.lines[self.row][..self.col]) as u16;
             if cy < area.y + area.height - 1 && cx < area.x + area.width - 1 {
-                frame.set_cursor(cx, cy);
+                frame.set_cursor_position((cx, cy));
             }
         }
     }

@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - 'harbor/**'
+  workflow_dispatch:
 
 jobs:
   build:

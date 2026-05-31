@@ -49,6 +49,9 @@ bindkey -s '^r' '^urecall\n'
 # ── tdo — daily todo ───────────────────────────────────────────────────────────
 alias todo="$HOME/github.com/scripts/tdo/target/release/tdo"
 
+# ── devtool — developer utilities ─────────────────────────────────────────────
+alias dev="$HOME/github.com/scripts/devtool/target/release/devtool"
+
 # ── jot — quick capture ────────────────────────────────────────────────────────
 JOT_BIN="$HOME/github.com/scripts/jot/target/release/jot"
 

@@ -1,8 +1,14 @@
 pub mod base64;
 pub mod hash;
+pub mod html_entity;
 pub mod json;
+pub mod jwt;
+pub mod number_base;
 pub mod regex;
+pub mod string_stats;
+pub mod text_transform;
 pub mod timestamp;
+pub mod url;
 pub mod uuid;
 
 use crossterm::event::KeyEvent;
@@ -18,6 +24,8 @@ pub enum Focus {
 pub enum Action {
     Quit,
     FocusSidebar,
+    FocusInput,
+    FocusPattern,
     Nothing,
 }
 
