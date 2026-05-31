@@ -41,6 +41,10 @@ impl App {
                 Box::new(tools::number_base::NumberBaseTool::new()),
                 Box::new(tools::string_stats::StringStatsTool::new()),
                 Box::new(tools::html_entity::HtmlEntityTool::new()),
+                Box::new(tools::diff::DiffTool::new()),
+                Box::new(tools::yaml_json::YamlJsonTool::new()),
+                Box::new(tools::hmac_gen::HmacTool::new()),
+                Box::new(tools::cron_expr::CronTool::new()),
             ],
         }
     }

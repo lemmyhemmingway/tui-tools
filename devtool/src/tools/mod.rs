@@ -1,5 +1,8 @@
 pub mod base64;
+pub mod cron_expr;
+pub mod diff;
 pub mod hash;
+pub mod hmac_gen;
 pub mod html_entity;
 pub mod json;
 pub mod jwt;
@@ -10,6 +13,7 @@ pub mod text_transform;
 pub mod timestamp;
 pub mod url;
 pub mod uuid;
+pub mod yaml_json;
 
 use crossterm::event::KeyEvent;
 use ratatui::{layout::Rect, Frame};

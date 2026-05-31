@@ -10,19 +10,16 @@
 - [x] UUID generator — v4, Enter/Space, history
 - [x] Timestamp — unix/ISO/local/day; current time when empty
 - [x] Regex — pattern + test string, Tab to switch, match positions
-
-## In progress
-
-- [ ] Text Transform — UPPER/lower/Title/camelCase/PascalCase/snake_case/kebab-case/SCREAMING_SNAKE
-- [ ] Number Base — decimal ↔ hex ↔ binary ↔ octal live
-- [ ] String Stats — chars, words, lines, bytes, unique chars
-- [ ] HTML Entity — encode/decode `&amp;` `&lt;` `&#x...;` etc.
+- [x] Text Transform — UPPER/lower/Title/camelCase/PascalCase/snake_case/kebab-case/SCREAMING_SNAKE
+- [x] Number Base — decimal ↔ hex ↔ binary ↔ octal live
+- [x] String Stats — chars, words, lines, bytes, unique chars
+- [x] HTML Entity — encode/decode `&amp;` `&lt;` `&#x...;` etc.
+- [x] Diff — two text areas (Before/After), colored line diff
+- [x] YAML ↔ JSON — auto-detect input, convert to the other
+- [x] HMAC — key + message → HMAC-SHA256 / HMAC-SHA512
+- [x] Cron — 5 or 6-field expression, next 8 fire times
 
 ## Backlog
 
-- [ ] Cron parser — human-readable description + next 5 fire times (needs `croner` or similar dep)
-- [ ] Diff — two text areas, colored added/removed lines
-- [ ] YAML ↔ JSON — paste either, get the other (needs `serde_yaml` dep)
 - [ ] JWT signer/verifier — HS256 sign + verify with key field
-- [ ] HMAC — input + key + algorithm → signature
 - [ ] PEM decoder — subject/issuer/expiry/SANs from certificate
