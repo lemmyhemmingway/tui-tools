@@ -45,6 +45,8 @@ impl App {
                 Box::new(tools::yaml_json::YamlJsonTool::new()),
                 Box::new(tools::hmac_gen::HmacTool::new()),
                 Box::new(tools::cron_expr::CronTool::new()),
+                Box::new(tools::jwt_sign::JwtSignTool::new()),
+                Box::new(tools::pem_decoder::PemDecoderTool::new()),
             ],
         }
     }

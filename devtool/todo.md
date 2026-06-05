@@ -19,7 +19,9 @@
 - [x] HMAC — key + message → HMAC-SHA256 / HMAC-SHA512
 - [x] Cron — 5 or 6-field expression, next 8 fire times
 
+- [x] JWT Sign/Verify — HS256 sign JSON payload or verify a JWT against a secret
+- [x] PEM Decoder — subject/issuer/validity/serial/SANs from X.509 certificate
+
 ## Backlog
 
-- [ ] JWT signer/verifier — HS256 sign + verify with key field
-- [ ] PEM decoder — subject/issuer/expiry/SANs from certificate
+(empty — all planned tools shipped)
