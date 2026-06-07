@@ -47,6 +47,12 @@ impl App {
                 Box::new(tools::cron_expr::CronTool::new()),
                 Box::new(tools::jwt_sign::JwtSignTool::new()),
                 Box::new(tools::pem_decoder::PemDecoderTool::new()),
+                Box::new(tools::password::PasswordTool::new()),
+                Box::new(tools::list_tools::ListToolsTool::new()),
+                Box::new(tools::uri_parser::UriParserTool::new()),
+                Box::new(tools::bcrypt_tool::BcryptTool::new()),
+                Box::new(tools::json_csv::JsonCsvTool::new()),
+                Box::new(tools::token_counter::TokenCounterTool::new()),
             ],
         }
     }
@@ -60,7 +66,7 @@ fn draw(frame: &mut ratatui::Frame, app: &mut App) {
 
     let columns = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Length(18), Constraint::Min(0)])
+        .constraints([Constraint::Length(20), Constraint::Min(0)])
         .split(root[0]);
 
     let items: Vec<ListItem> = app.tools.iter().enumerate().map(|(i, t)| {

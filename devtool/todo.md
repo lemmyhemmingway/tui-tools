@@ -21,7 +21,13 @@
 
 - [x] JWT Sign/Verify — HS256 sign JSON payload or verify a JWT against a secret
 - [x] PEM Decoder — subject/issuer/validity/serial/SANs from X.509 certificate
+- [x] Password Generator — length, charset toggles, Enter to regenerate
+- [x] List Tools — Sort A→Z/Z→A, Deduplicate, Reverse, Trim, Frequency count
+- [x] URI Parser — scheme / host / port / path / query params / fragment
+- [x] Bcrypt — hash plaintext (cost 12) or verify hash against plaintext
+- [x] JSON ↔ CSV — auto-detect direction, array of objects ↔ CSV with headers
+- [x] Token Counter — chars / words / lines / ≈ tokens + context window usage bars
 
 ## Backlog
 
-(empty — all planned tools shipped)
+(empty)
